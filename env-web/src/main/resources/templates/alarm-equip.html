@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>设备报警信息</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/admin.css}">
+  <script type="text/javascript" th:src="@{/js/fast-helper.js}"></script>
+  <script th:src="@{/layuiadmin/layui/layui.js}"></script>
+</head>
+<body>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">设备报警信息</div>
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">区域</label>
+              <div class="layui-input-inline">
+                <select class="layui-input"  name="siteArea" id="selectParent" lay-filter="selectParent" lay-search></select>
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label">站点</label>
+              <div class="layui-input-inline">
+                <select class="layui-input"  name="siteId" id="siteId" lay-filter="siteId" lay-search></select>
+              </div>
+            </div>
+            <div class="layui-inline">
+	          <label class="layui-form-label">日期</label>
+	          <div class="layui-input-inline"> 
+	            <input type="text" class="layui-input" name="startDate"  autocomplete="off" id="test-laydate-start" placeholder="开始日期" lay-key="1">
+	          </div>
+	          <div class="layui-form-mid">
+	            -
+	          </div>
+	          <div class="layui-input-inline">
+	            <input type="text" class="layui-input" name="endDate"  autocomplete="off" id="test-laydate-end" placeholder="结束日期" lay-key="2">
+	          </div>
+           </div>
+           <div class="layui-inline">
+	          <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search">
+	            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+	          </button>
+           </div>
+          </div>
+        </div>
+        <div class="layui-card-body">
+          <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
+          <script type="text/html" id="buttonTpl">
+       			{{#  if(d.state == 2){ }}
+                <span style="padding: 5px 5px;background-color: blue;color: white;border-radius: 5px">已完成</span>
+                {{#  } else { }}
+                <span style="padding: 5px 5px;background-color: orange;color: white;border-radius: 5px">待处理</span>
+                {{#  } }}
+      </script>
+      <script type="text/html" id="table-useradmin-admin">
+       <div class="layui-btn-container">
+             <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="complete">完成</button>
+          </div>
+      </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.config({
+    base: 'layuiadmin/'  //静态资源所在路径
+}).extend({
+    index: 'lib/index' //主入口模块
+}).use(['index', 'useradmin', 'form', 'laydate','table','jquery'], function(){
+    var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,laydate = layui.laydate
+        ,table = layui.table;
+    
+    $.ajax({
+		url : 'dictionaryType/getDictionaryList',
+		dataType : 'JSON',
+		data : {"type":4} ,
+   		type : 'POST',
+		success: function(result) {
+			var data = result.data;    
+		    $("#selectParent").empty();
+		    $("#selectParent").append("<option value=''></option>")
+		    for(var key in data){
+		    	$("#selectParent").append("<option value='" + key + "'>" + data[key] + "</option>");
+		    }
+		    form.render('select');
+		},
+		error: function() {
+			layer.msg('系统错误', {
+				icon: 5
+			});
+		}
+   });
+    
+    $.ajax({
+		url : 'site/siteList',
+		dataType : 'JSON',
+		data : {} ,
+   		type : 'POST',
+		success: function(result) {
+			var data = result.data;    
+		    $("#siteId").empty();
+		    var t="<option value=''></option>";
+      			for(var i=0;i<data.length;i++){
+      			t+="<option value="+data[i].id+">"+data[i].siteName+"</option>"
+      			}
+      			$('#siteId').append(t);
+      			 form.render('select');
+		},
+		error: function() {
+			layer.msg('系统错误', {
+				icon: 5
+			});
+		}
+   });
+    
+    form.on('select(selectParent)', function(data){
+    	$.ajax({
+    		url : 'site/siteList',
+			dataType : 'JSON',
+			data : {"siteArea":$("#selectParent").val()} ,
+       		type : 'POST',
+			success: function(result) {
+				var data = result.data;    
+			    $("#siteId").empty();
+			    var t="<option value=''></option>";
+	      			for(var i=0;i<data.length;i++){
+	      			t+="<option value="+data[i].id+">"+data[i].siteName+"</option>"
+	      			}
+	      			$('#siteId').append(t);
+	      			 form.render('select');
+			},
+			error: function() {
+				layer.msg('系统错误', {
+					icon: 5
+				});
+			}
+	   });
+    });
+	
+	table.render({
+	    elem: '#dataTable'
+	    ,url: 'alarm/selectAlarmInfoList'
+	    ,method: 'post'
+	    ,page: true
+	    ,where : {
+	    	type : 1
+	    }
+	    ,cols: [
+	    	[
+	    		{field: 'id', title: 'ID'}
+	            ,{field: 'siteName', title: '站点名称'}
+	            ,{field: 'siteAddress', title: '站点地址'}
+	            ,{field: 'yinziName', title: '设备名称'}
+	            ,{field: 'alarmName', title: '报警类型'}
+	            ,{field: 'addTime', title: '时间',templet:function (d) {                   
+	        	    return d.addTime.replace("T"," ");
+	            }}
+	            ,{field: 'state', templet: '#buttonTpl',title: '状态'}
+	            ,{title: '操作', align: 'center', fixed: 'right', toolbar: '#table-useradmin-admin'}
+	    ]
+	    	]
+	    ,text: '对不起，加载出现异常！'
+	})
+	
+	
+	 //监听搜索
+        form.on('submit(LAY-user-back-search)', function(data){
+            var field = data.field;
+            //执行重载
+            table.reload('dataTable', {
+                where: field
+            });
+        });
+	
+	  //监听工具条
+	  table.on('tool(dataTable)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'complete'){
+	    	layer.confirm('请确认该报警已处理', function(index){
+	    	$.ajax({
+	    		url:'alarm/complete',
+	    		type:'post',
+	    		data:{"id":data.id},
+	    		dataType:'json',
+	    		success:function(data){
+	    			layer.alert('操作成功', {
+						icon: 1
+					});
+	    			table.reload('dataTable');
+	    		}
+	    		})
+	    	});
+	    }
+	  });	
+	  
+	//开始日期
+	    var insStart = laydate.render({
+	        elem: '#test-laydate-start'
+	        ,max: 0
+	        ,done: function(value, date){
+	            //更新结束日期的最小日期
+	            insEnd.config.min = lay.extend({}, date, {
+	                month: date.month - 1
+	            });
+
+	            //自动弹出结束日期的选择器
+	            insEnd.config.elem[0].focus();
+	        }
+	    });
+	    //结束日期
+	    var insEnd = laydate.render({
+	        elem: '#test-laydate-end'
+	        ,max: 0
+	        ,done: function(value, date){
+	            //更新开始日期的最大日期
+	            insStart.config.max = lay.extend({}, date, {
+	                month: date.month - 1
+	            });
+	        }
+	    });
+	
+});
+
+
+</script>
+</body>
+</html>

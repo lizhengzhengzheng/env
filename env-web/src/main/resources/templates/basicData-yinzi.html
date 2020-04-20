@@ -1,0 +1,175 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>进度条</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/editTable.css}">
+	<link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+    <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/admin.css}">
+    <script type="text/javascript" th:src="@{/js/fast-helper.js}"></script>
+    <script th:src="@{/layuiadmin/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <style>
+        .layui-card-header .layui-icon {
+            left: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+    	<div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        	<div class="layui-form-item">
+            	<div class="layui-inline">
+                	<label class="layui-form-label">名称</label>
+		            <div class="layui-input-block">
+		            	<input type="text" name="name"  autocomplete="off" class="layui-input">
+		            </div>
+       			</div>
+        		<div class="layui-inline">
+          			<label class="layui-form-label">编号</label>
+		        	<div class="layui-input-block">
+		            	<input type="text" name="yinziNum"  autocomplete="off" class="layui-input">
+		        	</div>
+       			</div>
+        		<div class="layui-inline">
+          			<button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search">
+            		<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+          			</button>
+        		</div>
+    		</div>
+    	</div>
+        <div class="layui-card-body ">
+        	<div style="padding-bottom: 10px;">
+        		<button class="layui-btn layuiadmin-btn-admin" id="additem">添加</button>
+      		</div>
+            <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
+       	</div>
+	</div>
+</div>
+<script type="text/html" id="table-role-admin">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="del">删除</button>
+        <button class="layui-btn layui-btn-sm" lay-event="edit">编辑</button>
+    </div>
+</script>
+<script type="text/javascript">
+layui.use(['jquery', 'table', 'layer'], function(){
+    var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer;
+    
+    table.render({
+	    elem: '#dataTable'
+	    ,url: 'yinzi/pageList' 
+	    ,method: 'post'
+	    ,page: true
+	    ,cols: [
+	    	[
+	    		{field: 'id', title: 'ID'}
+	      ,{field: 'yinziNum', title: '编号'}
+	      ,{field: 'name', title: '名称'}
+	      ,{field: 'unit', title: '单位'}
+	      ,{field: 'limit1', title: 'Ⅰ类区间' }
+	      ,{field: 'limit2', title: 'Ⅱ类区间' }
+	      ,{field: 'limit3', title: 'Ⅲ类区间' }
+	      ,{field: 'limit4', title: 'Ⅳ类区间' }
+	      ,{field: 'limit5', title: 'Ⅴ类区间' }
+	      ,{title: '操作', width: 180, align: 'center', fixed: 'right', toolbar: '#table-role-admin'}
+	    ]
+	    	]
+	    ,text: '对不起，加载出现异常！'
+	  });
+    
+  //监听搜索
+    form.on('submit(LAY-user-back-search)', function(data){
+        var field = data.field;
+        //执行重载
+        table.reload('dataTable', {
+            where: field
+        });
+    });
+
+    $("#additem").on("click",function(){
+        layer.open({
+        	title: '添加因子信息',
+            type: 2,
+            content: 'view?url=basicData-yinzi-add' 
+            ,area: ['520px', '650px']
+            ,btn: ['确定', '取消']
+            ,yes: function(index, layero){
+                var iframeWindow = window['layui-layer-iframe'+ index]
+                    ,submitID = 'LAY-user-role-submit'
+                    ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                submit.trigger('click');
+            }
+        });
+    });
+
+    //监听工具条
+    table.on('tool(dataTable)', function (obj) {
+    	var data = obj.data;
+       if(obj.event == 'del'){
+        	layer.confirm('确定删除此因子吗？', function(index){
+        		$.ajax({
+	                url : 'yinzi/delete',
+	                data : {"id":data.id},
+	                type : 'POST',
+	                dataType : 'json',
+	                success : function(data){
+	                    if(data.success){
+	                        layer.alert(data.message, {icon: 1});
+	                        table.reload('dataTable');
+	                    }else{
+	                        layer.msg(data.message, {icon: 5});
+	                    }
+	                },
+	                error:function(){
+	                    layer.msg('系统错误', {icon: 5});
+	                }
+	            });
+            });
+        }else if(obj.event == 'edit'){
+        	var tr = $(obj.tr);
+
+            layer.open({
+              type: 2
+              ,title: '编辑因子信息'
+              ,content: 'view?url=basicData-yinzi-edit'
+              ,area: ['520px', '600px']
+              ,btn: ['确定', '取消']
+              ,yes: function(index, layero){
+               var submitID = 'LAY-user-role-submit'
+              ,submit = layero.find('iframe').contents().find('#'+ submitID);
+            	var body = layer.getChildFrame('body', index);
+            	body.find("#LAY-user-role-submit").click();
+              }
+              ,success: function(layero, index){           
+              	var body = layer.getChildFrame('body', index);
+                  body.find("#name").val(data.name);
+                  body.find("#unit").val(data.unit);
+                  body.find("#sort").val(data.sort);
+                  body.find("#upperLimit1").val(data.upperLimit1);
+                  body.find("#lowerLimit1").val(data.lowerLimit1);
+                  body.find("#upperLimit2").val(data.upperLimit2);
+                  body.find("#upperLimit3").val(data.upperLimit3);
+                  body.find("#upperLimit4").val(data.upperLimit4);
+                  body.find("#upperLimit5").val(data.upperLimit5);
+                  body.find("#lowerLimit2").val(data.lowerLimit2);
+                  body.find("#lowerLimit3").val(data.lowerLimit3);
+                  body.find("#lowerLimit4").val(data.lowerLimit4);
+                  body.find("#lowerLimit5").val(data.lowerLimit5);
+                  body.find("#id").val(data.id);
+                  body.find("#yinziNum").val(data.yinziNum);
+              }
+            })
+        }
+    });
+});
+</script>
+</body>
+</html>

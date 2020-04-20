@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.env.web.mapper.RoleInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.env.web.entity.RoleInfo">
+        <id column="role_id" property="roleId" />
+        <result column="role_name" property="roleName" />
+        <result column="role_desc" property="roleDesc" />
+        <result column="menu_list" property="menuList" />
+        <result column="state" property="state" />
+        <result column="project_id" property="projectId" />
+        <result column="create_at" property="createAt" />
+        <result column="create_user" property="createUser" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        role_id, role_name, role_desc, menu_list, state, project_id, create_at, create_user
+    </sql>
+    
+    <select id="roleList" resultType="com.env.web.vo.RoleInfoVo">
+    	SELECT * FROM role_info WHERE state = 0
+    	<if test="role.roleName != null and role.roleName != ''">
+			and role_name like CONCAT('%',#{role.roleName},'%')
+		</if>
+		<if test="role.projectId != null and role.projectId != 0">
+			and project_id = #{role.projectId}
+		</if>
+	</select>
+
+</mapper>

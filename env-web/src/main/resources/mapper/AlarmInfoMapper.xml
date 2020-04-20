@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.env.web.mapper.AlarmInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.env.web.entity.AlarmInfo">
+        <id column="id" property="id" />
+        <result column="site_id" property="siteId" />
+        <result column="yinzi_id" property="yinziId" />
+        <result column="alarm_id" property="alarmId" />
+        <result column="alarm_type" property="alarmType" />
+        <result column="add_time" property="addTime" />
+    </resultMap>
+    
+    <resultMap id="BaseResultVoMap" type="com.env.web.vo.AlarmInfoVo">
+        <id column="id" property="id" />
+        <result column="site_id" property="siteId" />
+        <result column="yinzi_id" property="yinziId" />
+        <result column="alarm_id" property="alarmId" />
+        <result column="alarm_type" property="alarmType" />
+        <result column="add_time" property="addTime" />
+        <result column="site_name" property="siteName" />
+        <result column="yinzi_name" property="yinziName" />
+        <result column="yinzi_num" property="yinziNum" />
+        <result column="alarm_name" property="alarmName" />
+        <result column="site_address" property="siteAddress" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, site_id, yinzi_id, alarm_id, alarm_type, add_time
+    </sql>
+    
+    <select id="findListPage" resultMap="BaseResultVoMap">
+	    SELECT a.*,b.site_name,c.name yinzi_name,c.yinzi_num,d.name alarm_name,b.site_address
+		FROM `alarm_info` a
+		LEFT JOIN `site_info` b ON a.`site_id` = b.`id`
+		LEFT JOIN `yinzi_info` c ON a.`yinzi_id` = c.`id`
+		LEFT JOIN `dictionary_type` d ON a.`alarm_id` = d.`id`
+		WHERE a.state != 1
+		<if test="siteId != null and siteId != 0">
+		AND a.`site_id` = #{siteId}
+		</if>
+		<if test="siteArea != null and siteArea != 0">
+		AND b.`site_area` = #{siteArea}
+		</if>
+		<if test="startDate != null and startDate != ''">
+		AND a.add_time >= #{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+		AND a.add_time &lt;= #{endDate}
+		</if>
+		<if test="type != null and type != 0">
+		AND a.alarm_type = #{type}
+		</if>
+		<if test="projectId != null and projectId != 0">
+		AND b.project_id = #{projectId}
+		</if>
+		ORDER BY a.add_time DESC
+    </select>
+
+</mapper>
