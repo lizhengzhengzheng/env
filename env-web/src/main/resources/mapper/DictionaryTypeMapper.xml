@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.env.web.mapper.DictionaryTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.env.web.entity.DictionaryType">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="alarm_num" property="alarmNum" />
+        <result column="project_id" property="projectId" />
+        <result column="create_at" property="createAt" />
+        <result column="create_user" property="createUser" />
+        <result column="state" property="state" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, type, name, alarm_num, project_id, create_at, create_user, state
+    </sql>
+    
+    <select id="findListPage" resultMap="BaseResultMap">
+    	SELECT * FROM dictionary_type WHERE state = 0
+		<if test="dictionaryType.name != null and dictionaryType.name != ''">
+		and name like CONCAT('%',#{dictionaryType.name},'%')
+		</if>
+		<if test="dictionaryType.alarmNum != null and dictionaryType.alarmNum != ''">
+		and alarm_num like CONCAT('%',#{dictionaryType.alarmNum},'%')
+		</if>
+		<if test="dictionaryType.projectId != null and dictionaryType.projectId != 0">
+		and project_id = #{dictionaryType.projectId}
+		</if>
+		order by type 
+	</select>
+
+</mapper>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>实时监测</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+		<link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/admin.css}">
+		<link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/iconfont.css}">
+		<link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/aliiconfont.css}">
+		<script type="text/javascript" th:src="@{/js/fast-helper.js}"></script>
+		<script  th:src="@{/layuiadmin/layui/layui.js}"></script>
+		<script  th:src="@{/layuiadmin/layui/jquery-1.7.2.min.js}"></script>
+		<script  th:src="@{/layuiadmin/layui/iconfont.js}"></script>
+		<script  th:src="@{/layuiadmin/layui/iconfont1.js}"></script>
+		<style>
+			.icon {
+				width: 1.5rem;
+				height: 1.5rem;
+				vertical-align: -0.5em;
+				fill: currentColor;
+				overflow: hidden;
+			}
+		</style>
+		<style type="text/css">
+			body,
+			html {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				font-family: "微软雅黑";
+			}
+			
+			#allmap {
+				width: 100%;
+				height: 100%;
+			}
+			
+			p {
+				margin-left: 5px;
+				font-size: 14px;
+			}
+			
+			.map-card-p {
+				margin: 0;
+				line-height: 2;
+				font-size: 13px;
+				text-indent: 1em;
+				color: #333333
+			}
+			
+			.map-top-card span {
+				color: #CF1900;
+			}
+			
+			 ::-webkit-scrollbar {
+				width: 5px;
+			}
+			
+			 ::-webkit-scrollbar-track {
+				background-color: #dbddeb;
+			}
+			
+			 ::-webkit-scrollbar-thumb {
+				background-color: #00aff0;
+			}
+			
+			 ::-webkit-scrollbar-thumb:hover {
+				background-color: #3cc23e
+			}
+			
+			 ::-webkit-scrollbar-thumb:active {
+				background-color: #00aff0
+			}
+		</style>
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=PzLpNGM94aKE4cKXR7UwxZaPLLO21kEg"></script>
+		<script type="text/javascript" src="http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"></script>
+
+	</head>
+
+	<body>
+	
+		<div class="layui-fluid" id="LAY-app-message" style="width: 97%;height: 95%">
+		
+			<div style="width: 200px;height: 20px;position: absolute;top: 15px;z-index: 1000;font-size: 0.8rem;">
+				<p style="position: absolute;text-align: left;">
+					<a style="color: #337ab7" data="hidden" class="showOrHiden">收起窗口▲</a>
+				</p>
+			</div>
+			
+			<div id="panel">
+				<form id="param" style="width: 200px;height: 100px;background-color: #ffffff;position: absolute;top: 40px;z-index: 1000;font-size: 0.8rem;box-shadow:0 0 5px #6f6f6f ">
+				
+					<div style="margin: 10px">
+						<strong>区域</strong>
+						<select  style="margin: 9px 3px;width: 125px" name="siteArea" lay-filter="attributeChild" id="attributeChild">	
+						</select>
+					</div>
+					
+					<div style="margin: 10px">
+						<strong>名称</strong>
+						<select  style="margin: 9px 3px;width: 100px" name="id" lay-filter="id" id="id">	
+						</select>
+						<button class="layui-btn layui-btn-sm layui-btn-normal" style="position: absolute;" id="selectMap" type="button">搜索</button>
+					</div>
+			
+				</form>
+		
+				<div style="width: 200px;height: 230px;background-color: #ffffff;position: absolute;top: 140px;z-index: 1000;box-shadow:0 0 5px #6f6f6f;overflow-y: scroll;font-size: 0.8rem;" >
+					<div style="margin: 10px">
+						<strong>点位状态</strong>
+					</div>
+					
+					<div style="margin: 10px">
+						<span style="padding: 5px 15px;background-color: #1E9FFF;color: white;font-size: 0.7rem;border-radius:5px">正常</span>
+						<span style="padding: 5px 15px;background-color: #FF5722;color: white;font-size: 0.7rem;border-radius:5px">超标</span>
+						<span style="padding: 5px 15px;background-color: #FFB800;color: white;font-size: 0.7rem;border-radius:5px">离线</span>
+					</div>
+					
+					<div style="margin: 10px">
+						<strong>点位类型</strong>
+					</div>
+					
+					<div style="margin: 10px 10px 10px 20px">
+						<p style="line-height: 30px">
+							<svg class="icon" aria-hidden="true">
+								<use xlink:href="#icon-shuizhijianceduanmian-"></use>
+							</svg>
+							<span style="font-size: 0.8rem;">湖库</span>
+						</p>
+						
+						<p style="line-height: 30px">
+							<svg class="icon" aria-hidden="true">
+								<use xlink:href="#icon-nongyinyongshuijiance"></use>
+							</svg>
+							<span style="font-size: 0.8rem;">饮用水</span>
+						</p>
+						
+						<p style="line-height: 30px">
+							<svg class="icon" aria-hidden="true">
+								<use xlink:href="#icon-hubo"></use>
+							</svg>
+							<span style="font-size: 0.8rem;">大气</span>
+						</p>
+						
+						<p style="line-height: 30px">
+							<svg class="icon" aria-hidden="true">
+								<use xlink:href="#icon-qita"></use>
+							</svg>
+							<span style="font-size: 0.8rem;">其它</span>
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<div id="mapTopCard"></div>
+			<script id="mapTopCardTemplate" type="text/html">
+				<div class="map-top-card" style="height: 30px;background-color: #ffffff;position: absolute;left: 100px;top: 5px;z-index: 1000;font-size: 0.8rem;line-height: 30px;padding: 0 10px;">
+					{{# layui.each(d, function(index, item){ }} {{ item.name }}：<span>{{ item.value }}</span> {{# }) }}
+				</div>
+			</script>
+
+			<div id="allmap"></div>
+		</div>
+		
+		<script>
+			layui.config({
+				base: 'layuiadmin/' //静态资源所在路径
+			}).extend({
+				index: 'lib/index' //主入口模块
+			}).use(['laytpl', 'jquery', 'index', 'form'], function() {
+				var $ = layui.$,
+					admin = layui.admin,
+					element = layui.element,
+					laytpl = layui.laytpl,
+					form = layui.form;
+				
+				$.ajax({
+            		url : 'dictionaryType/getDictionaryList',
+					dataType : 'JSON',
+					data : {"type":4} ,
+	           		type : 'POST',
+					success: function(result) {
+						var data = result.data;    
+					    $("#attributeChild").empty();
+					    $("#attributeChild").append("<option value=''></option>")
+					    for(var key in data){
+					    	$("#attributeChild").append("<option value='" + key + "'>" + data[key] + "</option>");
+					    }
+					},
+					error: function() {
+						layer.msg('系统错误', {
+							icon: 5
+						});
+					}
+			   });
+							
+				 $(document).on('click','#selectMap',function(){
+                     reqsMarkerArr(1);
+                });
+				 
+                $(document).on('change','#attributeChild',function(){
+                	$.ajax({
+                		url : 'site/siteList',
+						dataType : 'JSON',
+						data : {"siteArea":$("#attributeChild").val()} ,
+		           		type : 'POST',
+						success: function(result) {
+							var data = result.data;    
+						    $("#id").empty();
+						    var t="<option value=''></option>";
+	      	      			for(var i=0;i<data.length;i++){
+	      	      			t+="<option value="+data[i].id+">"+data[i].siteName+"</option>"
+	      	      			}
+	      	      			$('#id').append(t);
+	      	      			 form.render('select');
+						},
+						error: function() {
+							layer.msg('系统错误', {
+								icon: 5
+							});
+						}
+				   });
+                });
+               
+				//绑定事件，展示 列表，隐藏列表
+				$(document).on("click", ".showOrHiden", function() {
+					if($(this).attr("data") == "show") {
+						$("#panel").show();
+						$(this).attr("data", "hidden");
+						$(this).text("收起窗口▲");
+					} else {
+						$("#panel").hide();
+						$(this).attr("data", "show");
+						$(this).text("展开窗口▼");
+					}
+				});
+				
+
+				//创建map对象
+				var map = new BMap.Map("allmap");
+				//右上角，仅包含平移和缩放按钮
+				var top_right_navigation = new BMap.NavigationControl({
+					anchor: BMAP_ANCHOR_TOP_RIGHT,
+					type: BMAP_ANCHOR_TOP_LEFT
+				});
+				map.addControl(top_right_navigation); //开启右上角缩放平移
+				map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+
+				function reqsMarkerArr(frequency) {
+					var postData = "";
+					if(frequency === 1){
+						postData = $("#param").serialize();
+					}
+					$.ajax({
+						url : 'site/site_list_data',
+						dataType : 'JSON',
+						data : postData ,
+		           		type : 'POST',
+						success: function(res) {
+							map.clearOverlays();;
+							//第7步：绘制点 
+							var markerArr = res.data;
+							if(markerArr.length>0){
+								var point = new BMap.Point(markerArr[0].longitude, markerArr[0].latitude);
+								map.centerAndZoom(point, 13); //设置中心点坐标和地图级别
+							}
+							for(var i = 0; i < markerArr.length; i++) {
+								var p0 = markerArr[i].longitude;
+								var p1 = markerArr[i].latitude;
+								var icon = getMarkIcon(markerArr[i]);
+								var lableAndButtonColor = getLableAndButtonColor(markerArr[i]);
+								var title = getLableTitle(markerArr[i]);
+								var maker = addMarker(new window.BMap.Point(p0, p1), lableAndButtonColor, title, icon);
+								addInfoWindow(maker, markerArr[i]);
+							}
+						},
+						error: function() {
+							layer.msg('加载站点数据失败', {
+								icon: 5
+							});
+						}
+					});
+					
+					$.ajax({
+						url : 'site/statistical_site',
+						dataType : 'JSON',
+						data : postData ,
+		           		type : 'POST',
+						success: function(res) {
+							laytpl(mapTopCardTemplate.innerHTML).render(res.data, function(html) {
+								document.getElementById('mapTopCard').innerHTML = html;
+							});
+						}
+					});
+						
+				}
+				
+				reqsMarkerArr(0);
+				setInterval(reqsMarkerArr,900000);
+
+				//拿到该站点的图标
+				function getMarkIcon(data) {
+					var iconUrl = "layuiadmin/icon/" + data.typeId + ".png";
+					return iconUrl;
+				};
+
+				//拿到lable的颜色
+				function getLableAndButtonColor(data) {
+					var flag = "#1E9FFF";
+					if(data.data.length == 0) {
+						flag = "#FFB800";
+					} else {
+						$.each(data.data, function(index, v) {
+							if(v.yinziValue < v.minValue || v.yinziValue > v.maxValue) {
+								flag = "#FF5722";
+							}
+						});
+					}
+					return flag;
+				}
+				
+				// 添加标注  
+				function addMarker(point, color, title, icon) {
+					//设置标注的头
+					var label = new BMap.Label(title, {
+						offset: new BMap.Size(15, -25)
+					});
+					label.setStyle({
+						width: "120px",
+						//字体的颜色
+						color: 'white',
+						//lable的颜色
+						background: color,
+						border: '1px solid "#ff8355"',
+						borderRadius: "5px",
+						textAlign: "center",
+						height: "26px",
+						lineHeight: "26px"
+					});
+					//设置图标以及大小
+					var myIcon = new BMap.Icon(icon, new BMap.Size(30, 30));
+					//添加标注点
+					var marker = new BMap.Marker(point, {
+						icon: myIcon
+					});
+					marker.setLabel(label);
+					map.addOverlay(marker);
+					return marker;
+				};
+				
+				// 添加标注点lable
+				function getLableTitle(marker) {
+					var sContent = "<lable>";
+					sContent += marker.siteName;
+					sContent += "</lable>";
+					return sContent;
+				}
+				// 添加信息窗口  
+				function addInfoWindow(marker, poi) {
+					var sContent = "";
+					if(poi.data.length <= 0) {
+						sContent = "<div style='width: 300px;height: 330px'>获取站点监测失败。。。请检查该站点联网状况</div>";
+					} else {
+						sContent +=
+							"<div >" +
+							"<h4 style='margin:0 0 5px 0;padding:0.2em 0;color: #1E9FFF;font-weight: bold'>" + poi.siteName + "</h4>" +
+							"<p class='map-card-p'>站点类型：" + getType(poi.typeId) + "</p>" +
+							"<p class='map-card-p'>地址：" + poi.siteAddress + "</p>" +
+							"<p class='map-card-p'>站点状态：<span style='color: #CF1900'>" + poi.siteState + "</span></p>" +
+							"<div style='width: 300px;height: 1px;border-top:1px dashed #333333;margin: 10px 0px'></div>" +
+							"<table class='layui-table'><thead><tr><th>检测因子</th><th>检测值</th><th>单位</th><th>级别</th></tr></thead><tbody>";
+						$.each(poi.data, function(index, v) {
+								sContent += "<tr>";
+								sContent += "<td>";
+								sContent += v.yinziName;
+								sContent += "</td>";
+								sContent += "<td>";
+								sContent += v.yinziValue;
+								sContent += "</td>";
+								sContent += "<td>";
+								sContent += v.yinziUnit;
+								sContent += "</td>";
+								sContent += "<td>";
+								sContent += v.level;
+								sContent += "</td>";
+								sContent += "</tr>";
+						});
+						sContent += "</div>";
+					}
+					var infoWindow = new BMap.InfoWindow(sContent);
+					var openInfoWinFun = function() {
+						marker.openInfoWindow(infoWindow);
+						//图片加载完毕重绘infowindow，要是有图片时使用，imgDemo为图片所在img标签的id
+						/*document.getElementById('imgDemo').onload = function() {
+							infoWindow.redraw(); //防止在网速较慢，图片未加载时，生成的信息框高度比图片的总高度小，导致图片部分被隐藏
+						}*/
+					};
+					marker.addEventListener("click", openInfoWinFun);
+				}
+                
+			});
+			
+			function getType(data){
+				if(data==1) return"饮用水"
+				if(data==2) return"湖库"
+				if(data==3) return"大气"
+				if(data==4) return"其他"
+			}
+		</script>
+	</body>
+</html>

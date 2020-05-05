@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>进度条</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/editTable.css}">
+	<link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+    <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/admin.css}">
+    <script type="text/javascript" th:src="@{/js/fast-helper.js}"></script>
+    <script th:src="@{/layuiadmin/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <style>
+        .layui-card-header .layui-icon {
+            left: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+    	<div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        	<div class="layui-form-item">
+            	<div class="layui-inline">
+                	<label class="layui-form-label">名称</label>
+		            <div class="layui-input-block">
+		            	<input type="text" name="name"  autocomplete="off" class="layui-input">
+		            </div>
+       			</div>
+        		<div class="layui-inline">
+          			<label class="layui-form-label">编号</label>
+		        	<div class="layui-input-block">
+		            	<input type="text" name="alarmNum"  autocomplete="off" class="layui-input">
+		        	</div>
+       			</div>
+        		<div class="layui-inline">
+          			<button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search">
+            		<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+          			</button>
+        		</div>
+    		</div>
+    	</div>
+        <div class="layui-card-body ">
+        	<div style="padding-bottom: 10px;">
+        		<button class="layui-btn layuiadmin-btn-admin" id="additem">添加</button>
+      		</div>
+            <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
+       	</div>
+	</div>
+</div>
+<script type="text/html" id="table-role-admin">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="del">删除</button>
+        <button class="layui-btn layui-btn-sm" lay-event="edit">编辑</button>
+    </div>
+</script>
+<script type="text/javascript">
+layui.use(['jquery', 'table', 'layer'], function(){
+    var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer;
+    
+    table.render({
+	    elem: '#dataTable'
+	    ,url: 'dictionaryType/pageList' 
+	    ,method: 'post'
+	    ,page: true
+	    ,cols: [
+	    	[
+	      {field: 'type', title: '类型',templet:function (d) {   
+	    	  if(d.type == 1){
+	    		 return "设备报警"; 
+	    	  }else if(d.type == 2){
+	    		  return "站点报警"; 
+	    	  }else if(d.type == 3){
+	    		  return "设备状态"; 
+	    	  }else if(d.type == 4){
+	    		  return "区域"; 
+	    	  }else{
+	    		  return ""; 
+	    	  }
+          }}
+	      ,{field: 'name', title: '名称'}
+	      ,{field: 'alarmNum', title: '编号'}
+	      ,{field: 'createAt', title: '创建时间',templet:function (d) {                   
+      	    return d.createAt.replace("T"," ");
+          }}
+	      ,{title: '操作', width: 180, align: 'center', fixed: 'right', toolbar: '#table-role-admin'}
+	    ]
+	    	]
+	    ,text: '对不起，加载出现异常！'
+	  });
+    
+  //监听搜索
+    form.on('submit(LAY-user-back-search)', function(data){
+        var field = data.field;
+        //执行重载
+        table.reload('dataTable', {
+            where: field
+        });
+    });
+
+    $("#additem").on("click",function(){
+        layer.open({
+        	title: '添加因子信息',
+            type: 2,
+            content: 'view?url=basicData-dictionary-add' 
+            ,area: ['400px', '450px']
+            ,btn: ['确定', '取消']
+            ,yes: function(index, layero){
+                var iframeWindow = window['layui-layer-iframe'+ index]
+                    ,submitID = 'LAY-user-role-submit'
+                    ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                submit.trigger('click');
+            }
+        });
+    });
+
+    //监听工具条
+    table.on('tool(dataTable)', function (obj) {
+    	var data = obj.data;
+       if(obj.event == 'del'){
+        	layer.confirm('确定删除此项吗？', function(index){
+        		$.ajax({
+	                url : 'dictionaryType/delete',
+	                data : {"id":data.id},
+	                type : 'POST',
+	                dataType : 'json',
+	                success : function(data){
+	                    if(data.success){
+	                        layer.alert(data.message, {icon: 1});
+	                        table.reload('dataTable');
+	                    }else{
+	                        layer.msg(data.message, {icon: 5});
+	                    }
+	                },
+	                error:function(){
+	                    layer.msg('系统错误', {icon: 5});
+	                }
+	            });
+            });
+        }else if(obj.event == 'edit'){
+        	var tr = $(obj.tr);
+            layer.open({
+              type: 2
+              ,title: '编辑因子信息'
+              ,content: 'view?url=basicData-dictionary-edit'
+              ,area: ['520px', '600px']
+              ,btn: ['确定', '取消']
+              ,yes: function(index, layero){
+               var submitID = 'LAY-user-role-submit'
+              ,submit = layero.find('iframe').contents().find('#'+ submitID);
+            	var body = layer.getChildFrame('body', index);
+            	body.find("#LAY-user-role-submit").click();
+              }
+              ,success: function(layero, index){           
+              	var body = layer.getChildFrame('body', index);
+                  body.find("#name").val(data.name);
+                  body.find("#alarmNum").val(data.alarmNum);
+                  body.find("#id").val(data.id);
+                  body.find("#type").val(data.type);
+                  var iframe = layero.find('iframe')[0].contentWindow;
+                  iframe.layui.form.render('select');
+              }
+            })
+        }
+    });
+});
+</script>
+</body>
+</html>

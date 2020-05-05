@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+		<script type="text/javascript" th:src="@{/js/fast-helper.js}"></script>
+        <script th:src="@{/layuiadmin/layui/layui.js}"></script>
+        <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+	</head>
+	<body>
+		<form id="additem">
+			<div class="layui-form" lay-filter="layuiadmin-form-role" id="layuiadmin-form-role" style="padding: 20px 30px 0 0;">
+				<div class="layui-form-item">
+					<label class="layui-form-label">因子编号</label>
+					<div class="layui-input-block">
+						<input id="id" name="id" type="hidden" value="">
+						<input type="text" name="yinziNum" id="yinziNum" readonly="readonly" lay-verify="required" placeholder="请输入因子编号" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">因子名称*</label>
+					<div class="layui-input-block">
+						<input type="text" name="name" id="name" lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">因子单位*</label>
+					<div class="layui-input-block">
+						<input type="text" name="unit" id="unit" lay-verify="required" placeholder="请输入单位" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+				    <div class="layui-inline">
+				      <label class="layui-form-label">Ⅰ类*</label>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text"  name="lowerLimit1" id="lowerLimit1" placeholder="最小值"  lay-verify=""  autocomplete="off" class="layui-input SectionOneMin">
+				      </div>
+				      <div class="layui-form-mid">-</div>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="upperLimit1" id="upperLimit1" placeholder="最大值"  lay-verify="" autocomplete="off" class="layui-input SectionOneMax">
+				      </div>
+				    </div>
+				</div>
+				
+				<div class="layui-form-item">
+				    <div class="layui-inline">
+				      <label class="layui-form-label">Ⅱ类*</label>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="lowerLimit2" id="lowerLimit2" placeholder="最小值" lay-verify=""  autocomplete="off" class="layui-input SectionTwoMin">
+				      </div>
+				      <div class="layui-form-mid">-</div>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="upperLimit2" id="upperLimit2" placeholder="最大值"  lay-verify="" autocomplete="off" class="layui-input SectionTwoMax">
+				      </div>
+				    </div>
+				</div>
+				
+				<div class="layui-form-item">
+				    <div class="layui-inline">
+				      <label class="layui-form-label">Ⅲ类*</label>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="lowerLimit3" id="lowerLimit3" placeholder="最小值"  lay-verify="" autocomplete="off" class="layui-input SectionThreeMin">
+				      </div>
+				      <div class="layui-form-mid">-</div>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="upperLimit3" id="upperLimit3" placeholder="最大值"  lay-verify="" autocomplete="off" class="layui-input SectionThreeMax">
+				      </div>
+				    </div>
+				</div>
+				
+				<div class="layui-form-item">
+				    <div class="layui-inline">
+				      <label class="layui-form-label">Ⅳ类*</label>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="lowerLimit4" id="lowerLimit4" placeholder="最小值" lay-verify=""  autocomplete="off" class="layui-input SectionFourMin">
+				      </div>
+				      <div class="layui-form-mid">-</div>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="upperLimit4" id="upperLimit4" placeholder="最大值" lay-verify="" autocomplete="off" class="layui-input SectionFourMax">
+				      </div>
+				    </div>
+				</div>
+				
+				<div class="layui-form-item">
+				    <div class="layui-inline">
+				      <label class="layui-form-label">Ⅴ类*</label>
+				      <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="lowerLimit5" id="lowerLimit5" placeholder="最小值" lay-verify=""  autocomplete="off" class="layui-input SectionFiveMin" >
+				      </div>
+				      <div class="layui-form-mid">-</div>
+				     <div class="layui-input-inline" style="width: 155px;">
+				        <input type="text" name="upperLimit5" id="upperLimit5" placeholder="最大值" lay-verify=""autocomplete="off" class="layui-input SectionFiveMax">
+				      </div>
+				    </div>
+				</div>
+				
+				<div class="layui-form-item layui-hide">
+					<button class="layui-btn" lay-submit lay-filter="LAY-user-role-submit" id="LAY-user-role-submit">提交</button>
+				</div>
+
+			</div>
+		</form>
+		<script>
+			//Demo
+			layui.use('form', function() {
+				var form = layui.form;
+				form.verify({
+					verifySectionOne: function(value, item){
+						var oneMin = Number($(".SectionOneMin").val());
+						var oneMax = Number($(".SectionOneMax").val());
+						if (oneMin >= oneMax) {
+							return 'Ⅰ类范围不合法';
+						}
+					},
+					verifySectionTwo: function(value, item){
+						var twoMin = Number($(".SectionTwoMin").val());
+						var twoMax = Number($(".SectionTwoMax").val());
+						var oneMax = Number($(".SectionOneMax").val());
+						if (twoMin >= twoMax) {
+							return 'Ⅱ类范围不合法';
+						}
+						if (twoMin <= oneMax) {
+							return 'Ⅱ类最小值应大于Ⅰ类最大值';
+						}
+					},
+					
+					verifySectionThree: function(value, item){
+						var threeMin = Number($(".SectionThreeMin").val());
+						var threeMax = Number($(".SectionThreeMax").val());
+						var twoMax = Number($(".SectionTwoMax").val());
+						if(threeMin >= threeMax){
+							return 'Ⅲ类范围不合法';
+						} 
+						if (threeMin <= twoMax) {
+							return 'Ⅲ类最小值应大于Ⅱ类最大值';
+						}
+					},
+					
+					verifySectionFour: function(value, item){
+						var fourMin = Number($(".SectionFourMin").val());
+						var fourMax = Number($(".SectionFourMax").val());
+						var threeMax = Number($(".SectionThreeMax").val());
+						if(fourMin >= fourMax){
+							return 'Ⅳ类范围不合法';
+						} 
+						if (fourMin <= threeMax) {
+							return 'Ⅳ类最小值应大于Ⅲ类最大值';
+						}
+					},
+					
+					verifySectionFive: function(value, item){
+						var fiveMin = Number($(".SectionFiveMin").val());
+						var fiveMax = Number($(".SectionFiveMax").val());
+						var fourMax = Number($(".SectionFourMax").val());
+						console.log(fiveMin +":" +fiveMax);
+						console.log(fiveMin >= fiveMax);
+						if(fiveMin >= fiveMax){
+							return 'Ⅴ类范围不合法';
+						}
+						if (fiveMin <= fourMax) {
+							return 'Ⅴ类最小值应大于Ⅳ类最大值';
+						}
+					}
+				});
+				//监听提交
+				form.on('submit(LAY-user-role-submit)', function(data) {
+					$.ajax({
+						url: 'yinzi/update',
+						data: $("#additem").serialize(),
+						type: 'POST',
+						dataType: 'json',
+						success: function(data) {
+							if(data.success) {
+								layer.alert(data.msg, function(index){
+			           				  layer.close(index);
+			           				  window.parent.layer.closeAll();
+			           				  parent.layui.table.reload('dataTable',{page: {curr: 1}});
+			           				});
+							} else {
+								layer.msg(data.msg, {
+									icon: 5
+								});
+							}
+						},
+						error: function() {
+							layer.msg('系统错误', {
+								icon: 5
+							});
+						}
+					});
+					return false;
+				});
+			});
+		</script>
+	</body>
+</html>

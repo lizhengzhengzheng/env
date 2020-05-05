@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.env.web.mapper.MenuInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.env.web.entity.MenuInfo">
+        <id column="id" property="id" />
+        <result column="menu_name" property="menuName" />
+        <result column="link" property="link" />
+        <result column="sort" property="sort" />
+        <result column="css_style" property="cssStyle" />
+        <result column="parent_id" property="parentId" />
+        <result column="state" property="state" />
+        <result column="create_at" property="createAt" />
+    </resultMap>
+    
+    <resultMap type="com.env.web.vo.MenuTreeVo" id="treeMap">
+	  	<id column="id" property="id" />
+	    <result column="menu_name" property="name" />
+	    <result column="parent_id" property="pId" />
+  	</resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, menu_name, link, sort, css_style, parent_id, state, create_at
+    </sql>
+    
+    <select id = "findMenuTree" resultMap="treeMap">
+		select * from menu_info where state != 2
+		and id in
+		<foreach collection="collection" open="(" separator="," close=")" item="val">
+    		${val}
+		</foreach>
+	</select>
+
+</mapper>

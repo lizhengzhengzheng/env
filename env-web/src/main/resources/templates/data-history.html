@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>历史数据查询</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/admin.css}">
+  <script type="text/javascript" th:src="@{/js/fast-helper.js}"></script>
+  <script th:src="@{/layuiadmin/layui/layui.js}"></script>
+</head>
+<body>
+
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">站点</label>
+              <div class="layui-input-inline">
+                <select class="layui-input"  name="siteId" id="root"></select>
+              </div>
+            </div>
+            <div class="layui-inline">
+	          <label class="layui-form-label">日期</label>
+	          <div class="layui-input-inline"> 
+	            <input type="text" class="layui-input" name="startDate"  autocomplete="off" id="test-laydate-start" placeholder="开始日期" lay-key="1">
+	          </div>
+	          <div class="layui-form-mid">
+	            -
+	          </div>
+	          <div class="layui-input-inline">
+	            <input type="text" class="layui-input" name="endDate"  autocomplete="off" id="test-laydate-end" placeholder="结束日期" lay-key="2">
+	          </div>
+           </div>
+           <div class="layui-inline">
+	          <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-role-submit" id="LAY-user-role-submit">
+	          <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+	          </button>
+           </div>
+<!--          <div class="layui-inline">  -->
+<!--            <button class="layui-btn"  id="import">数据导入</button>  -->
+<!--          </div>  -->
+          </div>
+      </div>
+      <div class="layui-card-body">
+        <table id="dataTable" lay-filter="dataTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  layui.config({
+    base: 'layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'useradmin', 'table','form','laydate'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,form = layui.form
+    ,table = layui.table
+    ,laydate = layui.laydate;
+    
+      	 
+      		setTimeout(function(){
+      			$.ajax({
+      	      		url:'site/siteList',
+      	      		type:'post',
+      	      		data:{},
+      	    		async : 'false',
+      	      		dataType:'json',
+      	      		success:function(data){
+      	      			$('#root').empty();
+      	      			var t="";
+      	      			for(var i=0;i<data.data.length;i++){
+      	      			t+="<option value="+data.data[i].id+">"+data.data[i].siteName+"</option>"
+      	      			}
+      	      			$('#root').append(t);
+      	      			 form.render('select');
+      	      			var data = {};
+      	      			data.startDate = $('#test-laydate-start').val();
+      					data.endDate = $('#test-laydate-end').val();
+      					data.siteId = $('#root').val();
+      					loadTable(data);
+      	      		}
+      	      		})	
+    },250);
+      		
+      		
+    
+    //监听搜索
+    form.on('submit(LAY-user-role-submit)', function(data){
+      var field = data.field;
+      loadTable(field);
+    });
+      	
+      	//加载数据表格
+      	function loadTable(data){
+      		console.log(data);
+      		$.ajax({
+    		    type: 'post',
+    		    data: data,
+    		    url: 'monitoringData/historyHeader',
+    		    success: function(res) {
+    			    table.render({
+    					elem: '#dataTable',
+    					cols: [res.data], //设置表头
+    					url: 'monitoringData/historyData',
+    					limits: [10,30,50,70,100,1000,5000],
+    					where: data,
+    					method: 'post',
+    			        page: true,
+    					text: '对不起，加载出现异常！',
+    				    toolbar : true,
+    			        defaultToolbar: ['exports'],
+    			        done: function(res, curr, count){
+    			        	console.log(res);
+    			        }
+    				});
+    		    },
+    		    error: function() {
+    		        layer.msg('加载站点数据失败', {icon: 5}); 
+    		    }
+    	    });
+      	}
+      	
+      //模板导入模块
+         $("#import").click(function(){
+			layer.open({
+				type: 2,
+ 				content: 'view?url=data-history-import',
+ 				area: ['455px', '490px'],
+ 				btn: ['确定', '取消'],
+ 				yes: function(index, layero) {
+ 					var submitID = 'LAY-add-submit',
+ 						submit = layero.find('iframe').contents().find('#' + submitID);
+ 					submit.trigger('click');
+ 				}
+ 			});
+ 		});
+      	  
+    
+      //开始日期
+        var insStart = laydate.render({
+            elem: '#test-laydate-start'
+            ,max: 0
+            ,value: new Date()
+            ,done: function(value, date){
+                //更新结束日期的最小日期
+                insEnd.config.min = lay.extend({}, date, {
+                    month: date.month - 1
+                });
+
+                //自动弹出结束日期的选择器
+                insEnd.config.elem[0].focus();
+            }
+        });
+        //结束日期
+        var insEnd = laydate.render({
+            elem: '#test-laydate-end'
+            ,max: 0
+            ,value: new Date()
+            ,done: function(value, date){
+                //更新开始日期的最大日期
+                insStart.config.max = lay.extend({}, date, {
+                    month: date.month - 1
+                });
+            }
+        });
+        
+  });
+  
+
+
+  </script>
+</body>
+</html>

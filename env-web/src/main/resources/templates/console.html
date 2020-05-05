@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layuiAdmin 控制台主页一</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/admin.css}">
+  <script  th:src="@{/js/jquery-3.3.1.min.js}"></script>
+  <script  th:src="@{/layuiadmin/layui/layui.js?t=1}"></script>
+  <script  th:src="@{/layuiadmin/layui/echarts.min.js}"></script>
+  <script  th:src="@{/layuiadmin/layui/macarons.js}"></script>
+  <script  th:src="@{/js/fast-helper.js}"></script>
+</head>
+<body>
+<div class="layui-fluid">
+      <div class="layui-row layui-col-space15">
+      
+        <div class="layui-col-md6">
+          <div class="layui-card">
+            <div class="layui-card-header">质量统计(实时)</div>
+            <div class="layui-card-body">
+              <div id="level" style="height: 185px;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="layui-col-md6">
+          <div class="layui-card">
+            <div class="layui-card-header">数据概览(30天内)</div>
+            <div class="layui-card-body">
+              <div class="layui-carousel layadmin-carousel layadmin-backlog">
+                <div carousel-item>
+                  <ul class="layui-row layui-col-space10">
+                    <li class="layui-col-xs6">
+                      <div class="layadmin-backlog-body">
+                        <h3>总站点数</h3>
+                        <p><cite id="siteNum"></cite></p>
+                      </div>
+                    </li>
+                    <li class="layui-col-xs6">
+                      <div class="layadmin-backlog-body">
+                        <h3>站点报警</h3>
+                        <p><cite id="siteAlarm"></cite></p>
+                      </div>
+                    </li>
+                    <li class="layui-col-xs6">
+                      <div class="layadmin-backlog-body">
+                        <h3>设备报警</h3>
+                        <p><cite id="equipAlarm"></cite></p>
+                      </div>
+                    </li>
+                    <li class="layui-col-xs6">
+                      <div class="layadmin-backlog-body">
+                        <h3>总检测次数</h3>
+                        <p><cite id="checkNum"></cite></p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="layui-col-md12">
+          <div class="layui-card">
+            <div class="layui-card-header">实时数据</div>
+            <div class="layui-card-body">
+              <table id="LAY-site-management" lay-filter="LAY-site-management"></table>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+
+</div>
+
+
+<script>
+    layui.config({
+    	base: 'layuiadmin/' //静态资源所在路径
+    }).extend({
+    	index: 'lib/index' //主入口模块
+    }).use(['index', 'console','table','element'],function(){
+    	
+    	var $ = layui.$
+        ,table = layui.table
+        ,element = layui.element;
+    	
+    	 var myChart = echarts.init(document.getElementById('level'),'macarons');
+    		var transverseData = "";
+    		var cakeData = ""; 
+    	
+    	$(document).ready(function (){
+    		//实时数据
+      	  $.ajax({
+    		    type: 'post',
+    		    data: {},
+    		    url: 'console/shishiHeader',
+    		    success: function(res) {
+    			    table.render({
+    					elem: '#LAY-site-management',
+    					cols: [res.data], //设置表头
+    					url: 'console/shishiData',
+    					method: 'post',
+    			        page: false,
+    			        limit: 6000,
+    					text: '对不起，加载出现异常！'
+    				});
+    		    },
+    		    error: function() {
+    		        layer.msg('加载站点数据失败', {icon: 5}); 
+    		    }
+    	    });
+      	  
+    		//数据概览  项目简介  设备传输率
+      	$.ajax({
+		    type: 'post',
+		    data: {},
+		    url: 'console/console',
+		    success: function(res) {
+		    	var result = res.data;
+		    	$('#siteNum').html(result.siteNum);
+		    	$('#siteAlarm').html(result.siteAlarm);
+		    	$('#equipAlarm').html(result.equipAlarm);
+		    	$('#checkNum').html(result.checkNum);
+		    	element.init();
+		    },
+		    error: function() {
+		        layer.msg('加载站点数据失败', {icon: 5}); 
+		    }
+	    });
+
+
+       //水质级别
+      	 $.ajax({
+ 			url: 'console/waterLevel',
+ 			type: 'POST',
+ 			dataType: 'json',
+ 			success: function(data) {
+ 				transverseData = data.data.transverseData;
+ 				cakeData = data.data.cakeData;
+ 				myChart.option = {
+						tooltip: {
+							trigger: 'item',
+							formatter: "{a} <br/>{b}: {c} ({d}%)"
+						},
+						toolbox: {
+    		                feature: {
+    		                    saveAsImage: {}
+    		                }
+    		            },
+						legend: {
+							orient: 'vertical',
+					        x: 'left',
+							data: transverseData
+						},
+						series: [{
+							type: 'pie',
+							radius: '70%',
+							minAngle: 20,           　　 //最小的扇区角度（0 ~ 360），用于防止某个值过小导致扇区太小影响交互
+        				    avoidLabelOverlap: true,   //是否启用防止标签重叠策略
+							center: ['55%', '50%'],
+							avoidLabelOverlap: false,
+							data: cakeData,
+							itemStyle: {
+								normal: {
+								    color: function(params) {
+								            //自定义颜色
+								            var colorList = [
+								            '#9AFF9A','#ADD8E6', '#EE9A49', '#E066FF', '#EE4000'
+								            ];
+								            if(params.data.name.substr(0,1) == "Ⅰ")
+								                return colorList[0]
+								            if(params.data.name.substr(0,1) == "Ⅱ")
+									            return colorList[1]
+								            if(params.data.name.substr(0,1) == "Ⅲ")
+									            return colorList[2]
+								            if(params.data.name.substr(0,1) == "Ⅳ")
+									            return colorList[3]
+								            if(params.data.name.substr(0,1) == "Ⅴ")
+									            return colorList[4]
+								        }
+								    },
+								emphasis: {
+									shadowBlur: 10,
+									shadowOffsetX: 0,
+									shadowColor: 'rgba(0, 0, 0, 0.5)'
+								}
+							}
+						}]
+					};
+ 		    	    // 使用刚指定的配置项和数据显示图表。
+ 		    	    myChart.setOption(myChart.option);
+ 			},
+ 			error: function() {
+ 				layer.msg('系统错误', {
+ 					icon: 5
+ 				});
+ 			}
+ 		});
+        });
+    });
+</script>
+</body>
+</html>
+

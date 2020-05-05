@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.env.web.mapper.SiteInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.env.web.vo.SiteInfoVo">
+        <id column="id" property="id" />
+        <result column="site_name" property="siteName" />
+        <result column="site_area" property="siteArea" />
+        <result column="project_id" property="projectId" />
+        <result column="type_id" property="typeId" />
+        <result column="site_address" property="siteAddress" />
+        <result column="site_desc" property="siteDesc" />
+        <result column="longitude" property="longitude" />
+        <result column="latitude" property="latitude" />
+        <result column="site_img" property="siteImg" />
+        <result column="device_name" property="deviceName" />
+        <result column="access_code" property="accessCode" />
+        <result column="net_ip" property="netIp" />
+        <result column="sim_num" property="simNum" />
+        <result column="sim_store" property="simStore" />
+        <result column="networking_method" property="networkingMethod" />
+        <result column="state" property="state" />
+        <result column="upload_frequency" property="uploadFrequency" />
+        <result column="create_user" property="createUser" />
+        <result column="create_at" property="createAt" />
+        <collection property="data" ofType="com.env.web.entity.MonitoringData" resultMap="DataMap" />
+    </resultMap>
+    
+    <resultMap type="com.env.web.vo.MonitoringDataVo" id="DataMap">
+	    <result column="site_id"  property="siteId" />
+	    <result column="yinzi_id" property="yinziId" />
+	    <result column="yinzi_value"  property="yinziValue" />
+	    <result column="serial_num"  property="serialNum" />
+	    <result column="createAt"  property="createAt" />
+	    <result column="state"  property="state" />
+	    <result column="yinzi_num"  property="yinziNum" />
+	    <result column="yinzi_name"  property="yinziName" />
+	    <result column="yinzi_unit"  property="yinziUnit" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, site_name, site_area, user_id, project_id, type_id, site_address, site_desc, longitude, latitude, site_img, device_name, access_code, net_ip, sim_num, sim_store, networking_method, state, upload_frequency, create_user, create_at
+    </sql>
+    
+    <select id="findSiteList" resultMap="BaseResultMap">
+		SELECT a.*,b.`id`,b.`create_at` createAt,b.`serial_num`,b.`site_id`,b.`state`,b.`yinzi_id`,b.`yinzi_value`,
+		c.yinzi_num,c.name yinzi_name,c.unit yinzi_unit
+		FROM site_info a
+		LEFT JOIN monitoring_data b ON a.`id` = b.`site_id`
+		LEFT JOIN yinzi_info c on b.yinzi_id = c.id
+		WHERE b.serial_num IN
+		(SELECT serial_num FROM monitoring_data WHERE id IN
+		(SELECT MAX(id) FROM monitoring_data GROUP BY site_id))
+		AND a.`project_id` = #{projectId}
+		AND a.`state` = 0
+		<if test="siteArea != null and siteArea != 0">
+		and a.site_area = #{siteArea}
+		</if>
+		<if test="id != null and id != 0">
+		and a.id = #{id}
+		</if>
+		<if test="siteName != null and siteName !=''">
+		and a.site_name like CONCAT('%',#{siteName},'%')
+		</if>
+		<if test="siteAddress != null and siteAddress !=''">
+		and a.site_address like CONCAT('%',#{siteAddress},'%')
+		</if>
+		ORDER BY a.id,b.yinzi_id
+    </select>
+    
+    <select id="selectCode" resultType="string">
+		select access_code
+		from site_info
+		where project_id = #{projectId}
+		and state = 0
+	</select>
+	
+	<select id="sitePage" resultType="com.env.web.vo.SiteInfoVo">
+    	SELECT * FROM site_info WHERE state = 0
+    	<if test="site.siteName != null and site.siteName != ''">
+			and site_name like CONCAT('%',#{site.siteName},'%')
+		</if>
+		<if test="site.siteArea != null and site.siteArea != 0">
+			and site_area in(${site.siteArea}) 
+		</if>
+		<if test="site.projectId != null and site.projectId != 0">
+			and project_id = #{site.projectId}
+		</if>
+		<if test="site.typeId != null and site.typeId != 0">
+			and type_id = #{site.typeId}
+		</if>
+		<if test="site.siteAddress != null and site.siteAddress != ''">
+			and site_address like CONCAT('%',#{site.siteAddress},'%')
+		</if>
+		<if test="site.accessCode != null and site.accessCode != ''">
+			and access_code like CONCAT('%',#{site.accessCode},'%')
+		</if>
+		<if test="site.netIp != null and site.netIp != ''">
+			and net_ip like CONCAT('%',#{site.netIp},'%')
+		</if>
+		<if test="site.simNum != null and site.simNum != ''">
+			and sim_num like CONCAT('%',#{site.simNum},'%')
+		</if>
+		<if test="site.simStore != null and site.simStore != ''">
+			and sim_store like CONCAT('%',#{site.simStore},'%')
+		</if>
+		<if test="site.networkingMethod != null and site.networkingMethod != 0">
+			and networking_method = #{site.networkingMethod}
+		</if>
+	</select>
+
+</mapper>

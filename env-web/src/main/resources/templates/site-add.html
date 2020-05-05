@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>面板</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/layui/css/layui.css}">
+  <link rel="stylesheet"  media="all" th:href="@{/layuiadmin/style/admin.css}">
+  <script type="text/javascript" th:src="@{/js/fast-helper.js}"></script>
+  <script  th:src="@{/layuiadmin/layui/layui.js}"></script>
+  <script  th:src="@{/js/jquery-3.3.1.min.js}"></script>
+  <script src="http://api.map.baidu.com/api?v=2.0&ak=PzLpNGM94aKE4cKXR7UwxZaPLLO21kEg"></script>
+  <style>
+    .layui-upload-img{width: 92px; height: 92px; margin: 0 10px 10px 0;}
+
+    .layui-card-header .layui-icon {
+      left: 15px;
+    }
+     .layui-form-select dl{
+       max-height: 250px;
+     }
+  </style>
+</head>
+<body>
+<div class="layui-fluid" id="LAY-component-grid-all">
+  <div class="layui-row layui-col-space10">
+    <div class="layui-col-xs6 layui-col-sm7 layui-col-md8">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          <a href="view?url=site" style="margin-right: 30px">
+            <i class="layui-icon layui-icon-prev" ></i>
+          </a>
+          添加站点</div>
+        <div class="layui-card-body">
+          <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" action="" lay-filter="component-form-group">
+              <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">站点名称*</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="siteName" id="siteName" lay-verify="required" autocomplete="off"  class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-inline">
+                  <label class="layui-form-label">接入码*</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="accessCode" id="accessCode" lay-verify="required" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">所在区域*</label>
+                  <div class="layui-input-inline">
+                    <select class="layui-input" name="siteArea" id="siteArea" lay-verify="required"></select>
+                  </div>
+                </div>
+                <div class="layui-inline">
+                  <label class="layui-form-label">经纬度*</label>
+                  <div class="layui-input-inline" style="width: 100px;">
+                    <input name="longitude" type="text" id="longitude" placeholder="经度" lay-verify="required" autocomplete="off" class="layui-input">
+                  </div>
+                  <div class="layui-form-mid">-</div>
+                  <div class="layui-input-inline" style="width: 100px;">
+                    <input name="latitude" type="text" id="latitude" placeholder="纬度" lay-verify="required" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">设备名称</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="deviceName" id="deviceName"  autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-inline">
+                  <label class="layui-form-label">站点类型*</label>
+                  <div class="layui-input-inline">
+                  <select name="typeId" id="typeId" lay-verify="required" >
+	                  <option value="">请选择</option>
+	                  <option value="1">饮用水</option>
+	                  <option value="2">湖库</option>
+	                  <option value="3">大气</option>
+	                  <option value="4">其他</option>
+                  </select>
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">通信ip*</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="netIp" id="netIp"  autocomplete="off" class="layui-input" lay-verify="ip">
+                  </div>
+                </div>
+                <div class="layui-inline">
+                  <label class="layui-form-label">站点地址*</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="siteAddress" id="siteAddress" lay-verify="required" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">SIM卡号</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="simNum" id="simNum" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-inline">
+                  <label class="layui-form-label">SIM卡运营商</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="simStore" id="simStore" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item">
+
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">通讯方式</label>
+                  <div class="layui-input-inline">
+                    <select name="networkingMethod" id="networkingMethod">   
+                         <option value="">请选择</option>
+                         <option value="1">WiFi</option>   
+                         <option value="2">有线</option>   
+                         <option value="3">SIM卡</option>   
+                    </select>   
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">站点描述</label>
+                <div class="layui-input-block">
+                  <textarea name="siteDesc" id="siteDesc"  class="layui-textarea"></textarea>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">上传图片：</label>
+                <div class="layui-input-block">
+                  <div class="layui-upload">
+                    <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button><input class="layui-upload-file" type="file" accept="undefined" name="file">
+                    <input type="hidden" id="img_url" name="siteImg" value=""/>
+                    <div class="layui-upload-list">
+                      <img class="layui-upload-img" id="test-upload-normal-img">
+                      <p id="test-upload-demoText"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item layui-layout-admin">
+                <div class="layui-input-block">
+                  <div class="layui-footer" style="left: 0;">
+                    <button class="layui-btn" lay-submit="" lay-filter="component-form-demo1">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-xs6 layui-col-sm5 layui-col-md4">
+      <div class="layui-card">
+        <div class="layui-card-header"></div>
+        <div class="layui-card-body">
+          <div class="layui-inline">
+            <label class="layui-form-label">搜索地点：</label>
+            <div class="layui-input-inline">
+              <input name="address" type="text" id="address" class="inp layui-input">
+            </div>
+          </div>
+          <input type="button" value="搜索" onclick="codeAddress()" class="ana layui-btn">
+          <div style="width:90%;height:420px;border:1px solid gray;margin: 30px 5% 160px 5%" id="allmap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+    layui.config({
+        base: 'layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'upload'], function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,upload = layui.upload
+            ,form = layui.form;
+        
+
+        form.verify({
+        		ip: [
+        		/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+        		,'IP地址不符合规则'
+        		] 
+        	}); 
+        
+        $.ajax({
+			url:'dictionaryType/getDictionaryList',
+			type:'post',
+			data:{type:4},
+			async : 'false',
+			dataType:'json',
+			success:function(result){
+				$('#siteArea').empty();
+    			var t="";
+    			for(var key in result.data){
+    			t+="<option value="+key+">"+result.data[key]+"</option>"
+    			}
+    			$('#siteArea').append(t);
+    			 form.render('select');
+			}
+			})
+
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test-upload-normal'
+            ,url: build_path('web/upload')
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#test-upload-normal-img').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }else{
+                	document.getElementById("img_url").value = res.url;
+                }
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#test-upload-demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+        form.render(null, 'component-form-element');
+        element.render('breadcrumb', 'breadcrumb');
+
+        form.on('submit(component-form-demo1)', function(data){
+    		$.ajax({
+           		url : 'site/addSite',
+           		data : data.field ,
+           		dataType : 'JSON',
+           		type : 'POST',
+           		success : function(result){
+           			if(result.success){
+           				parent.layer.msg(result.msg,{time:1000},function(){
+                            //重新加载当前页面
+                            location.reload();
+                        });
+           	        }else{
+           	        	layer.msg(result.msg);
+           	        }
+           	   }
+           	});
+            return false;
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    // 百度地图API功能
+    var map = new BMap.Map("allmap");
+    //var map = new BMap.Map("allmap", { mapType: BMAP_SATELLITE_MAP });
+    var point = new BMap.Point(109.503789, 35.860026);
+    map.centerAndZoom(point, 20);
+    map.enableScrollWheelZoom();                  //启用滚轮放大缩小
+    //定位
+    var geolocation = new BMap.Geolocation();
+    geolocation.getCurrentPosition(function (r) {
+        if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+            var mk = new BMap.Marker(r.point);
+            map.addOverlay(mk);
+            map.panTo(r.point);
+            //mk.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+            mk.enableDragging();
+            //alert('您的位置：' + r.point.lng + ',' + r.point.lat);
+            document.getElementById("longitude").value = r.point.lng;
+            document.getElementById("latitude").value = r.point.lat;
+        }
+        else {
+            //alert('failed' + this.getStatus());
+        }
+    }, { enableHighAccuracy: true })
+
+    //add city
+    map.addControl(new BMap.CityListControl({
+        anchor: BMAP_ANCHOR_TOP_LEFT
+    }));
+
+    //add click
+    function showInfo(e) {
+        //alert(e.point.lng + ", " + e.point.lat);
+        document.getElementById("longitude").value = e.point.lng;
+        document.getElementById("latitude").value = e.point.lat;
+        var mk = new BMap.Marker(e.point);
+        map.addOverlay(mk);
+        map.panTo(e.point);
+        //mk.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+        deletePoint(); //删除所有标注
+    }
+    map.addEventListener("click", showInfo);
+
+    function deletePoint()
+    {
+        var allOverlay = map.getOverlays();
+        for (var i = 0; i < allOverlay.length - 1; i++) {
+            map.removeOverlay(allOverlay[i]);
+        }
+    }
+    //关于状态码
+    //BMAP_STATUS_SUCCESS    检索成功。对应数值“0”。
+    //BMAP_STATUS_CITY_LIST    城市列表。对应数值“1”。
+    //BMAP_STATUS_UNKNOWN_LOCATION    位置结果未知。对应数值“2”。
+    //BMAP_STATUS_UNKNOWN_ROUTE    导航结果未知。对应数值“3”。
+    //BMAP_STATUS_INVALID_KEY    非法密钥。对应数值“4”。
+    //BMAP_STATUS_INVALID_REQUEST    非法请求。对应数值“5”。
+    //BMAP_STATUS_PERMISSION_DENIED    没有权限。对应数值“6”。(自 1.1 新增)
+    //BMAP_STATUS_SERVICE_UNAVAILABLE    服务不可用。对应数值“7”。(自 1.1 新增)
+    //BMAP_STATUS_TIMEOUT    超时。对应数值“8”。(自 1.1 新增)
+
+    function codeAddress() {
+        // 创建地址解析器实例
+        var local = new BMap.LocalSearch(map, {
+            renderOptions:{map: map}
+        });
+        // 将地址解析结果显示在地图上,并调整地图视野
+        local.search(document.getElementById("address").value, function (point) {
+
+            if (point) {
+                map.centerAndZoom(point, 20);
+                map.addOverlay(new BMap.Marker(point));
+                document.getElementById("longitude").value = point.lng;
+                document.getElementById("latitude").value = point.lat;
+            } else {
+                alert("您输入的地址在地图中未找到，请重新输入地址!");
+            }
+        }, "");
+    }
+
+</script>
+</body>
+</html>
